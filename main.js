@@ -21,11 +21,15 @@ const player = $('.player');
 const progress = $('#progress');
 const nextBtn = $('.btn-next');
 const prevBtn = $('.btn-prev');
-
+const randomBtn = $('.btn-random');
+const repeatBtn = $('.btn-repeat');
 
 const app = {
+    isRandom: false,
     isPlaying: false,
+    isRepeat: false,
     currentIndex: 0,
+
     songs: [
 
         {
@@ -162,12 +166,44 @@ const app = {
         };
         //Xử lý khi click next/prev
         nextBtn.onclick = function() {
-            _this.nextSong();
+            if (_this.isRandom) {
+                _this.playRandomSong();
+            } else {
+                _this.nextSong();
+            }
             audio.play();
         };
         prevBtn.onclick = function() {
-            _this.prevSong();
+            if (_this.isRandom) {
+                _this.playRandomSong();
+            } else {
+                _this.prevSong();
+            }
             audio.play();
+        };
+
+        // Xử lý khi bấm random
+        randomBtn.onclick = function() {
+            console.log(_this.isRandom);
+            _this.isRandom = !_this.isRandom;
+            this.classList.toggle("active", _this.isRandom);
+
+        };
+        //Xử lý next khi kết thúc bài
+        audio.onended = function() {
+            if (_this.isRepeat) {
+                audio.play();
+            } else {
+                nextBtn.click();
+
+            }
+        };
+        //Xử lý repeat khi kết thúc bài
+        repeatBtn.onclick = function() {
+            console.log(_this.isRepeat);
+            _this.isRepeat = !_this.isRepeat;
+            this.classList.toggle("active", _this.isRepeat);
+
         };
 
 
@@ -193,6 +229,15 @@ const app = {
         if (this.currentIndex < 0) {
             this.currentIndex = this.songs.length - 1;
         }
+        this.loadCurrentSong();
+    },
+    playRandomSong: function() {
+        console.log(this.currentSong);
+        let newIndex;
+        do
+            newIndex = Math.floor(Math.random() * this.songs.length); while (this.currentIndex === newIndex);
+        this.currentIndex = newIndex;
+        console.log(this.currentIndex);
         this.loadCurrentSong();
     },
     start: function() {
